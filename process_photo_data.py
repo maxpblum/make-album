@@ -90,6 +90,8 @@ def get_sorted_photos(exifs, dates):
     photos = []
     for exif in exifs:
         orig_name = exif['SourceFile']
+        if orig_name.endswith('.mov'):
+            continue
         name_key = get_key_from_name(orig_name)
         new_img_obj = {}
         new_img_obj['image_file'] = (
