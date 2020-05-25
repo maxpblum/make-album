@@ -97,6 +97,8 @@ def get_sorted_photos(exifs, dates):
         new_img_obj['image_file'] = (
             '{}.jpg'.format(name_key)
             if get_key_from_name(orig_name).endswith('_heic') else orig_name)
+        if 'ImageWidth' in exif and 'ImageHeight' in exif:
+            new_img_obj['aspect'] = exif['ImageWidth'] * 1.0 / exif['ImageHeight']
         new_img_obj['date'] = dates[name_key]
         new_img_obj['code'] = get_random_letters(
             3, lambda x: contains_code(x, photos))
