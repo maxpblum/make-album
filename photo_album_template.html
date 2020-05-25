@@ -1,4 +1,12 @@
+<!DOCTYPE html>
+<html>
 <head>
+<title>Photo album</title>
+<script>
+window.addEventListener('load', (event) => {
+  console.log('page is fully loaded');
+});
+</script>
 <style>
 body {
 	padding: 0px;
@@ -24,6 +32,7 @@ body {
 	flex: 1 1;
 	justify-content: space-between;
 	border: 1px red dotted;
+	overflow: hidden;
 }
 .page-with-columns .line {
 	flex-direction: column;
@@ -56,16 +65,23 @@ body {
 	margin-right: 0px;
 }
 .photo {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	flex: 1 1;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	background-size: cover;
+	overflow: hidden;
+}
+.photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 </style>
 </head>
 <body>
 <!-- for_each_image -->
-    <div class="photo image_code" style="background-image: url('image_filename');">
+    <div class="photo image_code">
+	    <img src="image_filename">
     </div>
 <!-- end_for -->
 <!-- for_each_page -->
@@ -79,3 +95,4 @@ body {
   </div>
 <!-- end_for -->
 </body>
+</html>
