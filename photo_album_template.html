@@ -6,9 +6,18 @@
 window.addEventListener('load', (event) => {
   console.log('page is fully loaded');
 
+  const attachTagNameListener = (tagName, listener) => {
+    const wrappedListener = ev => {
+      const el = ev.target;
+      if (el.tagName.toLowerCase() === tagName.toLowerCase()) {
+        listener(el);
+      }
+    };
+    document.addEventListener('click', wrappedListener);
+  }
+
   // Attach direction toggle listener
-  const toggleDirection = ev => {
-    const el = ev.target;
+  const toggleDirection = el => {
     if (!el.className) return;
     el.className = (
       el.className.indexOf('page-with-columns') !== -1 ?
@@ -16,7 +25,7 @@ window.addEventListener('load', (event) => {
       el.className.replace('page-with-rows', 'page-with-columns')
     );
   };
-  document.addEventListener('click', toggleDirection);
+  attachTagNameListener('div', toggleDirection);
 });
 </script>
 <style>
