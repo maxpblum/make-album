@@ -18,9 +18,9 @@ body {
 	height: page_heightpx;
 	padding: page_paddingpx;
 	margin: 0px;
-	justify-content: space-between;
-	align-content: space-between;
+	align-content: space-around;
 	border: 1px black dotted;
+	flex-wrap: wrap;
 }
 .page-with-columns {
 	flex-direction: column;
@@ -30,8 +30,8 @@ body {
 }
 .photo {
 	display: flex;
-	flex: 1 1;
 	padding: photo_paddingpx;
+	object-fit: cover;
 }
 .page-with-rows .photo {
 	height: row_heightpx;
