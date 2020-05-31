@@ -76,7 +76,7 @@ class Template(object):
                 self.page_template  #
                 .replace('page_content', filled_images_string)  #
                 .replace('page_code', page['code'])  #
-                .replace('page_class', 'page-with-rows'))
+                .replace('page_class', 'page-with-columns'))
             filled_pages.append(new_filled_page)
         return ('{}{}{}'.format(self.pre_content, ''.join(filled_pages),
                                 self.post_content)  #
@@ -131,7 +131,7 @@ sizing = Sizing(
     pixels_per_unit=300,
     rows_per_page=3,
     columns_per_page=3,
-    photos_per_page=6,
+    photos_per_page=5,
 )
 
 with open('photo_album_template.html', 'r') as f:
