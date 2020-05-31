@@ -14,79 +14,40 @@ body {
 }
 .page {
 	display: flex;
-	width: 960px;
-	height: 960px;
-	padding: 20px;
+	width: page_widthpx;
+	height: page_heightpx;
+	padding: page_paddingpx;
 	margin: 0px;
 	justify-content: space-between;
+	align-content: space-between;
 	border: 1px black dotted;
 }
 .page-with-columns {
-	flex-direction: row;
+	flex-direction: column;
 }
 .page-with-rows {
-	flex-direction: column;
-}
-.line {
-	display: flex;
-	flex: 1 1;
-	justify-content: space-between;
-	border: 1px red dotted;
-	overflow: hidden;
-}
-.page-with-columns .line {
-	flex-direction: column;
-}
-.page-with-rows .line {
 	flex-direction: row;
-}
-.page-with-rows .photo {
-	margin-right: 20px;
-}
-.page-with-rows .photo:last-of-type {
-	margin-right: 0px;
-}
-.page-with-columns .photo {
-	margin-bottom: 20px;
-}
-.page-with-columns .photo:last-of-type {
-	margin-bottom: 0px;
-}
-.page-with-rows .line {
-	margin-bottom: 20px;
-}
-.page-with-rows .line:last-of-type {
-	margin-bottom: 0px;
-}
-.page-with-columns .line {
-	margin-right: 20px;
-}
-.page-with-columns .line:last-of-type {
-	margin-right: 0px;
 }
 .photo {
 	display: flex;
-	justify-content: center;
-	align-items: center;
 	flex: 1 1;
-	overflow: hidden;
+	padding: photo_paddingpx;
+}
+.page-with-rows .photo {
+	height: row_heightpx;
+}
+.page-with-columns .photo {
+	width: column_widthpx;
 }
 </style>
 </head>
 <body>
 <!-- for_each_image -->
-    <div class="photo image_code">
-	    <img src="image_filename" style="image_style">
-    </div>
+    <img src="image_filename" class="photo image_code">
 <!-- end_for -->
 <!-- for_each_page -->
   <div class="page page_class page_code">
     page_content
-  </div>
-<!-- end_for -->
-<!-- for_each_line -->
-  <div class="line">
-    line_content
   </div>
 <!-- end_for -->
 </body>
