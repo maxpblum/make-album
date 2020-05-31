@@ -10,7 +10,7 @@ function checkOverflow(el)
    if ( !curOverflow || curOverflow === "visible" )
       el.style.overflow = "hidden";
 
-   var isOverflowing = el.clientWidth < el.scrollWidth
+   var isOverflowing = el.clientWidth < el.scrollWidth 
       || el.clientHeight < el.scrollHeight;
 
    el.style.overflow = curOverflow;
@@ -42,19 +42,33 @@ window.addEventListener('load', (event) => {
   };
   attachTagNameListener('div', toggleDirection);
 
-  const layout = ['geu', 'cfb', 'wmu', 'hvk', 'cpz', 'ohu', 'fpm', 'kjz', 'vyp'];
+  const layout = ['columns', 'geu', 'cfb', 'wmu', 'hvk', 'cpz', 'rows', 'ohu', 'fpm', 'kjz', 'vyp'];
+
+  let forcedDirection;
 
   const getNewPage = () => {
     const page = document.createElement('div');
-    page.className = 'page page-with-columns';
+    const direction = forcedDirection || 'columns';
+    page.className = 'page page-with-' + direction;
+    if (forcedDirection) {
+      page.className += ' direction-forced';
+      forcedDirection = undefined;
+    }
     document.body.appendChild(page);
     return page;
   };
 
-  let newPage = getNewPage();
+  let newPage;
 
   for (const item of layout) {
     console.log('processing item: ', item);
+
+    if (['rows', 'columns'].indexOf(item) !== -1) {
+      forcedDirection = item;
+      continue;
+    }
+
+    if (!newPage) newPage = getNewPage();
 
     if (newPage && (item === 'break')) newPage = getNewPage();
 
@@ -69,9 +83,14 @@ window.addEventListener('load', (event) => {
       newPage.appendChild(photoEl);
 
       if (checkOverflow(newPage)) {
-        toggleDirection(newPage);
+        const toggleIfUnforced = () => {
+          if (newPage.className.indexOf('direction-forced') === -1) {
+            toggleDirection(newPage);
+          }
+        }
+        toggleIfUnforced();
         if (checkOverflow(newPage)) {
-          toggleDirection(newPage);
+          toggleIfUnforced();
           newPage.removeChild(photoEl);
           newPage = getNewPage();
           newPage.appendChild(photoEl);
@@ -81,7 +100,7 @@ window.addEventListener('load', (event) => {
       }
     }
   }
-
+ 
   if (newPage.children.length === 0) {
     document.body.removeChild(newPage);
   }
