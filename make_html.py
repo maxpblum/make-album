@@ -60,25 +60,17 @@ class Template(object):
                                                    '<!-- for_each_page -->',
                                                    '<!-- end_for -->')
 
-    def fill(self, sizing, pages):
-        filled_pages = []
-        for page in pages:
-            filled_images = []
-            for image in page['images']:
-                new_filled_image = (
-                    self.image_template  #
-                    .replace('image_code', image['code'])  #
-                    .replace('image_filename', image['filename']))
+    def fill(self, sizing, images):
+        filled_images = []
+        for image in images:
+            new_filled_image = (
+                self.image_template  #
+                .replace('image_code', image['code'])  #
+                .replace('image_filename', image['filename']))
 
-                filled_images.append(new_filled_image)
-            filled_images_string = ''.join(filled_images)
-            new_filled_page = (
-                self.page_template  #
-                .replace('page_content', filled_images_string)  #
-                .replace('page_code', page['code'])  #
-                .replace('page_class', 'page-with-columns'))
-            filled_pages.append(new_filled_page)
-        return ('{}{}{}'.format(self.pre_content, ''.join(filled_pages),
+            filled_images.append(new_filled_image)
+        filled_images_string = ''.join(filled_images)
+        return ('{}{}{}'.format(self.pre_content, filled_images_string,
                                 self.post_content)  #
                 .replace('page_height', '{}'.format(sizing.page_height))  #
                 .replace('page_width', '{}'.format(sizing.page_width))  #
@@ -89,26 +81,11 @@ class Template(object):
                 )
 
 
-def build_pages(sizing, sorted_images):
-    pages = []
-    current_page = None
+def build_images(sizing, sorted_images):
+    images = []
     for image in sorted_images:
-        if False and current_page is not None and len(
-                current_page['images']) >= sizing.photos_per_page:
-            pages.append(current_page)
-            current_page = None
-        if current_page is None:
-            current_page = {'code': 'p{}'.format(len(pages) + 1), 'images': []}
-
-        current_page['images'].append({
-            'code': image['code'],
-            'filename': image['image_file']
-        })
-
-    if current_page is not None and len(current_page['images']) > 0:
-        pages.append(current_page)
-
-    return pages
+        images.append({'code': image['code'], 'filename': image['image_file']})
+    return images
 
 
 parser = argparse.ArgumentParser(
@@ -140,8 +117,8 @@ with open('photo_album_template.html', 'r') as f:
 with open('{}/sorted_photos.json'.format(args.directory[0]), 'r') as f:
     metadata = json.load(f)
 
-pages = build_pages(sizing, metadata)
+images = build_images(sizing, metadata)
 template = Template('photo_album_template.html')
 
 with open('{}/album.html'.format(args.directory[0]), 'w') as f:
-    f.write(template.fill(sizing, pages))
+    f.write(template.fill(sizing, images))

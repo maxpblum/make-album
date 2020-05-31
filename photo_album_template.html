@@ -105,10 +105,13 @@ body {
   flex-direction: row;
 }
 .photo {
-  display: flex;
+  display: none;
   padding: photo_paddingpx;
   object-fit: cover;
   object-position: center;
+}
+.page .photo {
+  display: inline;
 }
 .page-with-rows .photo {
   height: row_heightpx;
