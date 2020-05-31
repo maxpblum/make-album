@@ -51,5 +51,18 @@ body {
     page_content
   </div>
 <!-- end_for -->
+<script>
+	const allDivs = [].concat(...document.getElementsByClassName('page'));
+	const toggleDirection = ev => {
+		  const el = ev.target;
+		  if (!el.className) return;
+		  el.className = (
+			      el.className.indexOf('page-with-columns') !== -1 ?
+			      el.className.replace('page-with-columns', 'page-with-rows') :
+			      el.className.replace('page-with-rows', 'page-with-columns')
+	          );
+	};
+	allDivs.forEach(div => div.addEventListener('click', toggleDirection));
+</script>
 </body>
 </html>
