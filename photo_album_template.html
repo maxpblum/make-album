@@ -5,63 +5,63 @@
 <script>
 window.addEventListener('load', (event) => {
   console.log('page is fully loaded');
+
+  // Attach direction toggle listener
+  const toggleDirection = ev => {
+    const el = ev.target;
+    if (!el.className) return;
+    el.className = (
+      el.className.indexOf('page-with-columns') !== -1 ?
+      el.className.replace('page-with-columns', 'page-with-rows') :
+      el.className.replace('page-with-rows', 'page-with-columns')
+    );
+  };
+  document.addEventListener('click', toggleDirection);
 });
 </script>
 <style>
 body {
-	padding: 0px;
-	margin: 0px;
+  padding: 0px;
+  margin: 0px;
 }
 .page {
-	display: flex;
-	width: page_widthpx;
-	height: page_heightpx;
-	padding: page_paddingpx;
-	margin: 0px;
-	align-content: space-around;
-	border: 1px black dotted;
-	flex-wrap: wrap;
+  display: flex;
+  width: page_widthpx;
+  height: page_heightpx;
+  padding: page_paddingpx;
+  margin: 0px;
+  align-content: space-around;
+  border: 1px black dotted;
+  flex-wrap: wrap;
 }
 .page-with-columns {
-	flex-direction: column;
+  flex-direction: column;
 }
 .page-with-rows {
-	flex-direction: row;
+  flex-direction: row;
 }
 .photo {
-	display: flex;
-	padding: photo_paddingpx;
-	object-fit: cover;
-	object-position: center;
+  display: flex;
+  padding: photo_paddingpx;
+  object-fit: cover;
+  object-position: center;
 }
 .page-with-rows .photo {
-	height: row_heightpx;
+  height: row_heightpx;
 }
 .page-with-columns .photo {
-	width: column_widthpx;
+  width: column_widthpx;
 }
 </style>
 </head>
 <body>
 <!-- for_each_image -->
-    <img src="image_filename" class="photo image_code">
+  <img src="image_filename" class="photo image_code">
 <!-- end_for -->
 <!-- for_each_page -->
   <div class="page page_class page_code">
     page_content
   </div>
 <!-- end_for -->
-<script>
-	const toggleDirection = ev => {
-		  const el = ev.target;
-		  if (!el.className) return;
-		  el.className = (
-			      el.className.indexOf('page-with-columns') !== -1 ?
-			      el.className.replace('page-with-columns', 'page-with-rows') :
-			      el.className.replace('page-with-rows', 'page-with-columns')
-	          );
-	};
-	document.addEventListener('click', toggleDirection);
-</script>
 </body>
 </html>
