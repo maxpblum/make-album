@@ -26,6 +26,33 @@ window.addEventListener('load', (event) => {
     );
   };
   attachTagNameListener('div', toggleDirection);
+
+  const layout = ['geu', 'cfb', 'break', 'wmu'];
+  let newPage;
+  for (const item of layout) {
+    console.log('processing item: ', item);
+    if (newPage && (item === 'break')) {
+      document.body.appendChild(newPage);
+      newPage = undefined;
+    }
+    if (!newPage) {
+      newPage = document.createElement('div');
+      newPage.className = 'page page-with-columns';
+    }
+    if (item !== 'break') {
+      const maybePhotoEl = document.querySelectorAll('img.' + item);
+      if (maybePhotoEl.length !== 1) {
+        throw new DOMException('Invalid document.querySelectorAll results for: img.' + item);
+      }
+      const photoEl = maybePhotoEl[0];
+      photoEl.parentNode.removeChild(photoEl);
+      console.log('Appending child to: ', newPage);
+      newPage.appendChild(photoEl);
+    }
+    if (newPage) {
+      document.body.appendChild(newPage);
+    }
+  }
 });
 </script>
 <style>
@@ -68,7 +95,7 @@ body {
   <img src="image_filename" class="photo image_code">
 <!-- end_for -->
 <!-- for_each_page -->
-  <div class="page page_class page_code">
+  <div class="page page_class page_code" style="display: none !important;">
     page_content
   </div>
 <!-- end_for -->

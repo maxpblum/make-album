@@ -93,7 +93,7 @@ def build_pages(sizing, sorted_images):
     pages = []
     current_page = None
     for image in sorted_images:
-        if current_page is not None and len(
+        if False and current_page is not None and len(
                 current_page['images']) >= sizing.photos_per_page:
             pages.append(current_page)
             current_page = None
