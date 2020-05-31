@@ -69,9 +69,15 @@ window.addEventListener('load', (event) => {
       newPage.appendChild(photoEl);
 
       if (checkOverflow(newPage)) {
-        newPage.removeChild(photoEl);
-        newPage = getNewPage();
-        newPage.appendChild(photoEl);
+        toggleDirection(newPage);
+        if (checkOverflow(newPage)) {
+          toggleDirection(newPage);
+          newPage.removeChild(photoEl);
+          newPage = getNewPage();
+          newPage.appendChild(photoEl);
+        }
+        // if we did not execute the above, switching the flow direction fixed
+        // the overflow issue
       }
     }
   }
