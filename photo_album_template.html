@@ -3,6 +3,21 @@
 <head>
 <title>Photo album</title>
 <script>
+function checkOverflow(el)
+{
+   var curOverflow = el.style.overflow;
+
+   if ( !curOverflow || curOverflow === "visible" )
+      el.style.overflow = "hidden";
+
+   var isOverflowing = el.clientWidth < el.scrollWidth
+      || el.clientHeight < el.scrollHeight;
+
+   el.style.overflow = curOverflow;
+
+   return isOverflowing;
+}
+
 window.addEventListener('load', (event) => {
   console.log('page is fully loaded');
 
@@ -27,18 +42,22 @@ window.addEventListener('load', (event) => {
   };
   attachTagNameListener('div', toggleDirection);
 
-  const layout = ['geu', 'cfb', 'break', 'wmu'];
-  let newPage;
+  const layout = ['geu', 'cfb', 'wmu', 'hvk', 'cpz', 'ohu', 'fpm', 'kjz', 'vyp'];
+
+  const getNewPage = () => {
+    const page = document.createElement('div');
+    page.className = 'page page-with-columns';
+    document.body.appendChild(page);
+    return page;
+  };
+
+  let newPage = getNewPage();
+
   for (const item of layout) {
     console.log('processing item: ', item);
-    if (newPage && (item === 'break')) {
-      document.body.appendChild(newPage);
-      newPage = undefined;
-    }
-    if (!newPage) {
-      newPage = document.createElement('div');
-      newPage.className = 'page page-with-columns';
-    }
+
+    if (newPage && (item === 'break')) newPage = getNewPage();
+
     if (item !== 'break') {
       const maybePhotoEl = document.querySelectorAll('img.' + item);
       if (maybePhotoEl.length !== 1) {
@@ -48,11 +67,19 @@ window.addEventListener('load', (event) => {
       photoEl.parentNode.removeChild(photoEl);
       console.log('Appending child to: ', newPage);
       newPage.appendChild(photoEl);
-    }
-    if (newPage) {
-      document.body.appendChild(newPage);
+
+      if (checkOverflow(newPage)) {
+        newPage.removeChild(photoEl);
+        newPage = getNewPage();
+        newPage.appendChild(photoEl);
+      }
     }
   }
+
+  if (newPage.children.length === 0) {
+    document.body.removeChild(newPage);
+  }
+
 });
 </script>
 <style>
@@ -69,6 +96,7 @@ body {
   align-content: space-around;
   border: 1px black dotted;
   flex-wrap: wrap;
+  overflow: hidden;
 }
 .page-with-columns {
   flex-direction: column;
