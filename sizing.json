@@ -1,0 +1,9 @@
+{
+  "width_units": 12,
+  "height_units": 12,
+  "margin_units": 0.5,
+  "space_between_photos_units": 0.25,
+  "pixels_per_unit": 100,
+  "rows_per_page": 3,
+  "columns_per_page": 3
+}

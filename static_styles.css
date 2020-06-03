@@ -1,0 +1,26 @@
+body {
+  padding: 0px;
+  margin: 0px;
+}
+.page {
+  display: flex;
+  margin: 0px;
+  align-content: space-around;
+  border: 1px black dotted;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+.page-with-columns {
+  flex-direction: column;
+}
+.page-with-rows {
+  flex-direction: row;
+}
+.photo {
+  display: none;
+  object-fit: cover;
+  object-position: center;
+}
+.page .photo {
+  display: inline;
+}
