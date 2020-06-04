@@ -2,6 +2,7 @@ import json
 import subprocess
 import argparse
 import random
+import shutil
 
 TIME_KEYS = ('FileAccessDate', 'FileModifyDate', 'CreateDate',
              'DateTimeOriginal')
@@ -86,7 +87,7 @@ def contains_code(code, photos):
     return False
 
 
-def get_sorted_photos(exifs, dates):
+def get_sorted_photo_data(exifs, dates):
     photos = []
     for exif in exifs:
         orig_name = exif['SourceFile']
@@ -106,7 +107,7 @@ def get_sorted_photos(exifs, dates):
     return sorted(photos, key=lambda p: p['date'])
 
 
-def output_sorted_photos(data, filename, directory):
+def output_sorted_photo_data(data, filename, directory):
     with open('{}/{}'.format(directory, filename), 'w') as f:
         json.dump(data, f)
 
@@ -122,27 +123,33 @@ def get_random_letters(n, should_reject=(lambda x: False)):
             return candidate
 
 
-parser = argparse.ArgumentParser(
-    description=
-    'Process a zipped photo album into browser-compatible formats with a metadata list for further processing'
-)
-parser.add_argument('zipfile',
-                    type=str,
-                    nargs=1,
-                    help='zip file containing the album')
-parser.add_argument(
-    '-d',
-    '--directory',
-    required=True,
-    type=str,
-    nargs=1,
-    help='directory in which to expand files (omit closing slash)')
+def get_parsed_args():
+    parser = argparse.ArgumentParser(
+        description=
+        'Process a zipped photo album into browser-compatible formats with a metadata list for further processing'
+    )
+    parser.add_argument('zipfile',
+                        type=str,
+                        nargs=1,
+                        help='zip file containing the album')
+    parser.add_argument(
+        '-d',
+        '--directory',
+        required=True,
+        type=str,
+        nargs=1,
+        help='directory in which to expand files (omit closing slash)')
 
-args = parser.parse_args()
+    return parser.parse_args()
+
+
+args = get_parsed_args()
 
 unzip(args.zipfile[0], args.directory[0])
 exifs = build_exifs(args.directory[0])
 convert_all(exifs, args.directory[0])
 dates = build_min_dates(exifs)
-sorted_photos = get_sorted_photos(exifs, dates)
-output_sorted_photos(sorted_photos, 'sorted_photos.json', args.directory[0])
+sorted_photo_data = get_sorted_photo_data(exifs, dates)
+output_sorted_photo_data(sorted_photo_data, 'sorted_photo_data.json', args.directory[0])
+for filename in ['main.js', 'sizing.json', 'static_styles.css']:
+    shutil.copyfile(filename, '{}/{}'.format(args.directory[0], filename))
