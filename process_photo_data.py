@@ -112,6 +112,11 @@ def output_sorted_photo_data(data, filename, directory):
         json.dump(data, f)
 
 
+def output_default_pagination(data, filename, directory):
+    with open('{}/{}'.format(directory, filename), 'w') as f:
+        f.write('\n'.join(obj['code'] for obj in data))
+
+
 def get_random_letters(n, should_reject=(lambda x: False)):
     candidate = ''
     while True:
@@ -151,5 +156,13 @@ convert_all(exifs, args.directory[0])
 dates = build_min_dates(exifs)
 sorted_photo_data = get_sorted_photo_data(exifs, dates)
 output_sorted_photo_data(sorted_photo_data, 'sorted_photo_data.json', args.directory[0])
-for filename in ['main.mjs', 'sizing.json', 'static_styles.css', 'index.html']:
+output_default_pagination(sorted_photo_data, 'pagination.txt', args.directory[0])
+for filename in [
+        'hotReload.mjs',
+        'main.mjs',
+        'sizing.json',
+        'static_styles.css',
+        'index.html',
+        'per_photo_styles.css',
+]:
     shutil.copyfile(filename, '{}/{}'.format(args.directory[0], filename))
