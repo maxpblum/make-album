@@ -1,6 +1,6 @@
 export default function(url, taskWhenChanged) {
   let stored = null;
-  return setInterval(() => {
+  const fetchAndUpdate = () =>
     fetch(url)
       .then(response => response.text())
       .then(text => {
@@ -10,5 +10,6 @@ export default function(url, taskWhenChanged) {
           taskWhenChanged(text, old);
         }
       });
-  }, 3000);
+  fetchAndUpdate();
+  return setInterval(fetchAndUpdate, 3000);
 };
