@@ -4,6 +4,25 @@ hotReload('sizing.json', (newText) => {
   console.log(newText);
 });
 
+hotReload('sorted_photo_data.json', (newText) => {
+  console.log(newText);
+});
+
+hotReload('pagination.txt', (newText) => {
+  console.log(newText);
+});
+
+hotReload('per_photo_styles.css', (newText) => {
+  if (!newText) return;
+  let styleTag = document.getElementById('per-photo-styles');
+  if (!styleTag) {
+    styleTag = document.createElement('style');
+    styleTag.id = 'per-photo-styles';
+    document.head.appendChild(styleTag);
+  }
+  styleTag.innerHTML = newText;
+});
+
 const checkOverflow = (el) => {
   var curOverflow = el.style.overflow;
   if (!curOverflow || curOverflow === "visible") el.style.overflow = "hidden";
