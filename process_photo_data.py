@@ -151,5 +151,5 @@ convert_all(exifs, args.directory[0])
 dates = build_min_dates(exifs)
 sorted_photo_data = get_sorted_photo_data(exifs, dates)
 output_sorted_photo_data(sorted_photo_data, 'sorted_photo_data.json', args.directory[0])
-for filename in ['main.js', 'sizing.json', 'static_styles.css']:
+for filename in ['main.mjs', 'sizing.json', 'static_styles.css', 'index.html']:
     shutil.copyfile(filename, '{}/{}'.format(args.directory[0], filename))

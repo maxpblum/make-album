@@ -1,18 +1,24 @@
-const checkOverflow = (el) = > {
+import hotReload from './hotReload.mjs';
+
+hotReload('sizing.json', (newText) => {
+  console.log(newText);
+});
+
+const checkOverflow = (el) => {
   var curOverflow = el.style.overflow;
-  if (!curOverflow || curOverflow == = "visible") el.style.overflow = "hidden";
+  if (!curOverflow || curOverflow === "visible") el.style.overflow = "hidden";
   var isOverflowing = el.clientWidth < el.scrollWidth || el.clientHeight < el.scrollHeight;
   el.style.overflow = curOverflow;
   return isOverflowing;
 };
 
 window.addEventListener(
-    'load', (event) = > {
+    'load', (event) => {
       console.log('page is fully loaded');
-      const attachTagNameListener = (tagName, listener) = > {
-        const wrappedListener = ev = > {
+      const attachTagNameListener = (tagName, listener) => {
+        const wrappedListener = ev => {
           const el = ev.target;
-          if (el.tagName.toLowerCase() == = tagName.toLowerCase()) {
+          if (el.tagName.toLowerCase() === tagName.toLowerCase()) {
             listener(el);
           }
         };
@@ -20,31 +26,19 @@ window.addEventListener(
       }
 
       // Attach direction toggle listener
-      const toggleDirection = el = > {
+      const toggleDirection = el => {
         if (!el.className) return;
-        el.className = (el.className.indexOf('page-with-columns') !=
-                        = -1 ? el.className.replace('page-with-columns', 'page-with-rows')
-                             : el.className.replace('page-with-rows', 'page-with-columns'));
+        el.className = (el.className.indexOf('page-with-columns') !== -1
+                       ? el.className.replace('page-with-columns', 'page-with-rows')
+                       : el.className.replace('page-with-rows', 'page-with-columns'));
       };
       attachTagNameListener('div', toggleDirection);
 
-      const layout = [
-        'columns',
-        'geu',
-        'cfb',
-        'wmu',
-        'hvk',
-        'cpz',
-        'rows',
-        'ohu',
-        'fpm',
-        'kjz',
-        'vyp',
-      ];
+      const layout = [];
 
       let forcedDirection;
 
-      const getNewPage = () = > {
+      const getNewPage = () => {
         const page = document.createElement('div');
         const direction = forcedDirection || 'columns';
         page.className = 'page page-with-' + direction;
@@ -61,18 +55,18 @@ window.addEventListener(
       for (const item of layout) {
         console.log('processing item: ', item);
 
-        if ([ 'rows', 'columns' ].indexOf(item) != = -1) {
+        if ([ 'rows', 'columns' ].indexOf(item) !== -1) {
           forcedDirection = item;
           continue;
         }
 
         if (!newPage) newPage = getNewPage();
 
-        if (newPage && (item == = 'break')) newPage = getNewPage();
+        if (newPage && (item === 'break')) newPage = getNewPage();
 
-        if (item != = 'break') {
+        if (item !== 'break') {
           const maybePhotoEl = document.querySelectorAll('img.' + item);
-          if (maybePhotoEl.length != = 1) {
+          if (maybePhotoEl.length !== 1) {
             throw new DOMException('Invalid document.querySelectorAll results for: img.' + item);
           }
           const photoEl = maybePhotoEl[0];
@@ -81,8 +75,8 @@ window.addEventListener(
           newPage.appendChild(photoEl);
 
           if (checkOverflow(newPage)) {
-            const toggleIfUnforced = () = > {
-              if (newPage.className.indexOf('direction-forced') == = -1) {
+            const toggleIfUnforced = () => {
+              if (newPage.className.indexOf('direction-forced') === -1) {
                 toggleDirection(newPage);
               }
             }
@@ -99,7 +93,7 @@ window.addEventListener(
         }
       }
 
-      if (newPage.children.length == = 0) {
+      if (newPage && newPage.children && newPage.children.length === 0) {
         document.body.removeChild(newPage);
       }
     });
