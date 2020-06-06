@@ -22,3 +22,15 @@ export const toggleDirection = el => {
                  ? el.className.replace('page-with-columns', 'page-with-rows')
                  : el.className.replace('page-with-rows', 'page-with-columns'));
 };
+
+export const forceDirection = (pageEl, direction) => {
+  if (!pageEl) {
+    throw new Error('page must exist to force a direction');
+  }
+  if (pageEl.className.indexOf(direction) === -1) {
+    toggleDirection(pageEl);
+  }
+  if (pageEl.className.indexOf('direction-forced') === -1) {
+    pageEl.className += ' direction-forced';
+  }
+};

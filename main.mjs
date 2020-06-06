@@ -95,50 +95,45 @@ function renderLayout(lastUnchangedPage, changedPagination) {
 
   let newPage;
 
-  const forceDirection = (direction) => {
-    if (!newPage) {
-      throw new Error('page must exist to force a direction');
-    }
-    if (newPage.className.indexOf(direction) === -1) {
-      toggleDirection(newPage);
-    }
-    if (newPage.className.indexOf('direction-forced') === -1) {
-      newPage.className += ' direction-forced';
-    }
-  };
-
   funcUtil.promisersListToPromiseChain(changedPagination.map(item => () => {
     console.log('processing item: ', item);
 
-    if ([ 'rows', 'columns' ].indexOf(item) !== -1) {
-      forceDirection(item);
+    if (!newPage) newPage = getNewPage();
+
+    if (item.startsWith('break')) {
+      // render a manual tag to find the right spot.
+      const debugTag = document.createElement('p');
+      debugTag.className = 'debugTag';
+      debugTag.innerHTML = item;
+      document.body.appendChild(debugTag);
+
+      newPage = getNewPage();
       return;
     }
 
-    if (!newPage) newPage = getNewPage();
-
-    if (newPage && (item === 'break')) newPage = getNewPage();
-
-    if (item !== 'break') {
-      return getLoadedPhoto(window.photoMap[item].image_file, item, newPage).then(photoEl => {
-        if (domUtil.checkOverflow(newPage)) {
-          const toggleIfUnforced = () => {
-            if (newPage.className.indexOf('direction-forced') === -1) {
-              domUtil.toggleDirection(newPage);
-            }
-          }
-          toggleIfUnforced();
-          if (domUtil.checkOverflow(newPage)) {
-            toggleIfUnforced();
-            newPage.removeChild(photoEl);
-            newPage = getNewPage();
-            newPage.appendChild(photoEl);
-          }
-          // if we did not execute the above, switching the flow direction fixed
-          // the overflow issue
-        }
-      });
+    if (item === 'rows' || item === 'columns') {
+      domUtil.forceDirection(newPage, item);
+      return;
     }
+
+    return getLoadedPhoto(window.photoMap[item].image_file, item, newPage).then(photoEl => {
+      if (domUtil.checkOverflow(newPage)) {
+        const toggleIfUnforced = () => {
+          if (newPage.className.indexOf('direction-forced') === -1) {
+            domUtil.toggleDirection(newPage);
+          }
+        }
+        toggleIfUnforced();
+        if (domUtil.checkOverflow(newPage)) {
+          toggleIfUnforced();
+          newPage.removeChild(photoEl);
+          newPage = getNewPage();
+          newPage.appendChild(photoEl);
+        }
+        // if we did not execute the above, switching the flow direction fixed
+        // the overflow issue
+      }
+    });
   })).then(() => {
     if (newPage && newPage.children && newPage.children.length === 0) {
       document.body.removeChild(newPage);
