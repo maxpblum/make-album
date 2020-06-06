@@ -1,19 +1,11 @@
-import hotReload from './hotReload.mjs';
+import { hotReload, loadOnce } from './hotReload.mjs';
+import * as domUtil from './domUtil.mjs';
+import * as funcUtil from './funcUtil.mjs';
 
-const getStyleTag = (tagId) => {
-  let styleTag = document.getElementById('per-photo-styles');
-  if (!styleTag) {
-    styleTag = document.createElement('style');
-    styleTag.id = tagId;
-    document.head.appendChild(styleTag);
-  }
-  return styleTag;
-};
-
-fetch('sorted_photo_data.json').then(
-  response => response.json()
-).then(json => {
+// Create photo metadata hash map.
+loadOnce('sorted_photo_data.json', (text) => {
   console.log('processing photo JSON');
+  const json = JSON.parse(text);
   window.photoMap = {};
   for (const photo of json) {
     window.photoMap[photo.code] = photo;
@@ -21,9 +13,10 @@ fetch('sorted_photo_data.json').then(
   console.log('done');
 });
 
+// Create layout style tag and hot reload.
 hotReload('sizing.json', (newText) => {
   const data = JSON.parse(newText);
-  const styleTag = getStyleTag('sizing-styles');
+  const styleTag = domUtil.getOrCreateStyleTag('sizing-styles');
 
   const unitsToPixels = units => units * data.pixels_per_unit;
 
@@ -57,30 +50,26 @@ hotReload('sizing.json', (newText) => {
   `;
 });
 
+// Create per-photo style tag and hot reload.
 hotReload('per_photo_styles.css', (newText) => {
   if (!newText) return;
-  getStyleTag('per-photo-styles').innerHTML = newText;
+  domUtil.getOrCreateStyleTag('per-photo-styles').innerHTML = newText;
 });
 
-hotReload('pagination.txt', (newText) => {
-  const pagination = newText.trim().split('\n');
-  renderLayout(pagination);
+// Load and render layout, and hot reload.
+hotReload('pagination.txt', (newText, oldText) => {
+  const oldPagination = oldText ? oldText.trim().split('\n') : [];
+  const newPagination = newText.trim().split('\n');
+  const {lastUnchangedPage, changedPagination} = getChangeInfo(oldPagination, newPagination);
+  renderLayout(lastUnchangedPage, changedPagination);
 });
 
-const checkOverflow = (el) => {
-  var curOverflow = el.style.overflow;
-  if (!curOverflow || curOverflow === "visible") el.style.overflow = "hidden";
-  var isOverflowing = el.clientWidth < el.scrollWidth || el.clientHeight < el.scrollHeight;
-  el.style.overflow = curOverflow;
-  return isOverflowing;
-};
-
-const toggleDirection = el => {
-  if (!el.className) return;
-  el.className = (el.className.indexOf('page-with-columns') !== -1
-                 ? el.className.replace('page-with-columns', 'page-with-rows')
-                 : el.className.replace('page-with-rows', 'page-with-columns'));
-};
+function getChangeInfo(oldPagination, newPagination) {
+  return {
+    lastUnchangedPage: null,
+    changedPagination: newPagination,
+  };
+}
 
 const getLoadedPhoto = (url, code, parent) => new Promise(resolve => {
   const photoEl = document.createElement('img');
@@ -90,35 +79,39 @@ const getLoadedPhoto = (url, code, parent) => new Promise(resolve => {
   photoEl.onload = () => resolve(photoEl);
 });
 
-const promiseChainFromGetters = getters => {
-  let cur = Promise.resolve();
-  for (const getter of getters) {
-    cur = cur.then(() => getter());
+function renderLayout(lastUnchangedPage, changedPagination) {
+  const pages = document.body.children;
+  for (let i = pages.length - 1; i >= 0; i--) {
+    if (pages[i] === lastUnchangedPage) break;
+    document.body.removeChild(pages[i]);
   }
-  return cur;
-};
 
-function renderLayout(layout) {
-  let forcedDirection;
   const getNewPage = () => {
     const page = document.createElement('div');
-    const direction = forcedDirection || 'columns';
-    page.className = 'page page-with-' + direction;
-    if (forcedDirection) {
-      page.className += ' direction-forced';
-      forcedDirection = undefined;
-    }
+    page.className = 'page page-with-columns';
     document.body.appendChild(page);
     return page;
   };
 
   let newPage;
 
-  promiseChainFromGetters(layout.map(item => () => {
+  const forceDirection = (direction) => {
+    if (!newPage) {
+      throw new Error('page must exist to force a direction');
+    }
+    if (newPage.className.indexOf(direction) === -1) {
+      toggleDirection(newPage);
+    }
+    if (newPage.className.indexOf('direction-forced') === -1) {
+      newPage.className += ' direction-forced';
+    }
+  };
+
+  funcUtil.promisersListToPromiseChain(changedPagination.map(item => () => {
     console.log('processing item: ', item);
 
     if ([ 'rows', 'columns' ].indexOf(item) !== -1) {
-      forcedDirection = item;
+      forceDirection(item);
       return;
     }
 
@@ -128,14 +121,14 @@ function renderLayout(layout) {
 
     if (item !== 'break') {
       return getLoadedPhoto(window.photoMap[item].image_file, item, newPage).then(photoEl => {
-        if (checkOverflow(newPage)) {
+        if (domUtil.checkOverflow(newPage)) {
           const toggleIfUnforced = () => {
             if (newPage.className.indexOf('direction-forced') === -1) {
-              toggleDirection(newPage);
+              domUtil.toggleDirection(newPage);
             }
           }
           toggleIfUnforced();
-          if (checkOverflow(newPage)) {
+          if (domUtil.checkOverflow(newPage)) {
             toggleIfUnforced();
             newPage.removeChild(photoEl);
             newPage = getNewPage();
@@ -167,6 +160,6 @@ window.addEventListener(
       }
 
       // Attach direction toggle listener
-      attachTagNameListener('div', toggleDirection);
+      attachTagNameListener('div', domUtil.toggleDirection);
 
     });

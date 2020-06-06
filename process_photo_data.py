@@ -3,6 +3,8 @@ import subprocess
 import argparse
 import random
 import shutil
+import http.server
+import socketserver
 
 TIME_KEYS = ('FileAccessDate', 'FileModifyDate', 'CreateDate',
              'DateTimeOriginal')
@@ -128,15 +130,51 @@ def get_random_letters(n, should_reject=(lambda x: False)):
             return candidate
 
 
+def create_data_dir(zipfile, directory):
+    unzip(zipfile, directory)
+    exifs = build_exifs(directory)
+    convert_all(exifs, directory)
+    dates = build_min_dates(exifs)
+    sorted_photo_data = get_sorted_photo_data(exifs, dates)
+    output_sorted_photo_data(sorted_photo_data, 'sorted_photo_data.json', directory)
+    output_default_pagination(sorted_photo_data, 'pagination.txt', directory)
+
+
+def copy_default_files(directory):
+    for filename in [
+            'hotReload.mjs',
+            'main.mjs',
+            'sizing.json',
+            'static_styles.css',
+            'index.html',
+            'per_photo_styles.css',
+            'domUtil.mjs',
+            'funcUtil.mjs',
+    ]:
+        shutil.copyfile(filename, '{}/{}'.format(directory, filename))
+
+
+def serve_album(directory):
+    PORT = 8000
+
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=directory, **kwargs)
+
+    with socketserver.TCPServer(("", PORT), Handler) as httpd:
+        print("serving at port", PORT)
+        try:
+            httpd.serve_forever()
+        except Exception:
+            httpd.shutdown()
+            raise Exception
+
+
 def get_parsed_args():
     parser = argparse.ArgumentParser(
         description=
         'Process a zipped photo album into browser-compatible formats with a metadata list for further processing'
     )
-    parser.add_argument('zipfile',
-                        type=str,
-                        nargs=1,
-                        help='zip file containing the album')
     parser.add_argument(
         '-d',
         '--directory',
@@ -144,25 +182,19 @@ def get_parsed_args():
         type=str,
         nargs=1,
         help='directory in which to expand files (omit closing slash)')
+    parser.add_argument(
+        '-z',
+        '--zipfile',
+        required=False,
+        type=str,
+        nargs=1,
+        help='zip file containing the album')
 
     return parser.parse_args()
 
 
-args = get_parsed_args()
-
-unzip(args.zipfile[0], args.directory[0])
-exifs = build_exifs(args.directory[0])
-convert_all(exifs, args.directory[0])
-dates = build_min_dates(exifs)
-sorted_photo_data = get_sorted_photo_data(exifs, dates)
-output_sorted_photo_data(sorted_photo_data, 'sorted_photo_data.json', args.directory[0])
-output_default_pagination(sorted_photo_data, 'pagination.txt', args.directory[0])
-for filename in [
-        'hotReload.mjs',
-        'main.mjs',
-        'sizing.json',
-        'static_styles.css',
-        'index.html',
-        'per_photo_styles.css',
-]:
-    shutil.copyfile(filename, '{}/{}'.format(args.directory[0], filename))
+if __name__ == '__main__':
+    args = get_parsed_args()
+    # create_data_dir(args.zipfile[0], args.directory[0])
+    copy_default_files(args.directory[0])
+    # serve_album(args.directory[0])
