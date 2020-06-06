@@ -90,6 +90,9 @@ function renderLayout(lastUnchangedPage, changedPagination) {
     const page = document.createElement('div');
     page.className = 'page page-with-columns';
     document.body.appendChild(page);
+    const pageContent = document.createElement('div');
+    pageContent.className = 'page-content';
+    page.appendChild(pageContent);
     return page;
   };
 
@@ -116,7 +119,9 @@ function renderLayout(lastUnchangedPage, changedPagination) {
       return;
     }
 
-    return getLoadedPhoto(window.photoMap[item].image_file, item, newPage).then(photoEl => {
+    newPage.className += ` ${item}`;
+    const photoCode = item.split(' ')[0];
+    return getLoadedPhoto(window.photoMap[photoCode].image_file, item, newPage.children[0]).then(photoEl => {
       if (domUtil.checkOverflow(newPage)) {
         const toggleIfUnforced = () => {
           if (newPage.className.indexOf('direction-forced') === -1) {
@@ -126,9 +131,9 @@ function renderLayout(lastUnchangedPage, changedPagination) {
         toggleIfUnforced();
         if (domUtil.checkOverflow(newPage)) {
           toggleIfUnforced();
-          newPage.removeChild(photoEl);
+          newPage.children[0].removeChild(photoEl);
           newPage = getNewPage();
-          newPage.appendChild(photoEl);
+          newPage.children[0].appendChild(photoEl);
         }
         // if we did not execute the above, switching the flow direction fixed
         // the overflow issue
