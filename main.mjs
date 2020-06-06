@@ -25,18 +25,26 @@ hotReload('sizing.json', (newText) => {
   const photoPadding = gap / 2.0;
   const pagePadding = pageMargin - photoPadding;
 
+  const outerWidth = unitsToPixels(data.width_units);
+  const outerHeight = unitsToPixels(data.height_units);
+
   // Since width and height in CSS don't include padding or margin, we need to
   // subtract.
   const pageWidth = unitsToPixels(data.width_units) - (2 * pagePadding);
   const pageHeight = unitsToPixels(data.height_units) - (2 * pagePadding);
-  const rowHeight = 1.0 * pageHeight / data.rows_per_page;
-  const columnWidth = 1.0 * pageWidth / data.columns_per_page;
+  const rowHeight = 1.0 * pageHeight / data.rows_per_page - gap;
+  const columnWidth = 1.0 * pageWidth / data.columns_per_page - gap;
 
   styleTag.innerHTML = `
-    .page {
+    .outer-page {
       padding: ${pagePadding}px;
       width: ${pageWidth}px;
       height: ${pageHeight}px;
+    }
+    .page {
+      width: ${pageWidth}px;
+      height: ${pageHeight}px;
+      padding: 0;
     }
     .photo {
       padding: ${photoPadding}px;
@@ -86,22 +94,12 @@ function renderLayout(lastUnchangedPage, changedPagination) {
     document.body.removeChild(pages[i]);
   }
 
-  const getNewPage = () => {
-    const page = document.createElement('div');
-    page.className = 'page page-with-columns';
-    document.body.appendChild(page);
-    const pageContent = document.createElement('div');
-    pageContent.className = 'page-content';
-    page.appendChild(pageContent);
-    return page;
-  };
-
   let newPage;
 
   funcUtil.promisersListToPromiseChain(changedPagination.map(item => () => {
     console.log('processing item: ', item);
 
-    if (!newPage) newPage = getNewPage();
+    if (!newPage) newPage = domUtil.getNewPage();
 
     if (item.startsWith('break')) {
       // render a manual tag to find the right spot.
@@ -110,7 +108,7 @@ function renderLayout(lastUnchangedPage, changedPagination) {
       debugTag.innerHTML = item;
       document.body.appendChild(debugTag);
 
-      newPage = getNewPage();
+      newPage = domUtil.getNewPage();
       return;
     }
 
@@ -119,20 +117,23 @@ function renderLayout(lastUnchangedPage, changedPagination) {
       return;
     }
 
-    newPage.className += ` ${item}`;
+    newPage.children[0].className += ` ${item}`;
     const photoCode = item.split(' ')[0];
     return getLoadedPhoto(window.photoMap[photoCode].image_file, item, newPage.children[0]).then(photoEl => {
-      if (domUtil.checkOverflow(newPage)) {
+      console.log('adding photo ' + item);
+      if (domUtil.checkOverflow(newPage.children[0])) {
+        console.log('overflowing');
         const toggleIfUnforced = () => {
-          if (newPage.className.indexOf('direction-forced') === -1) {
-            domUtil.toggleDirection(newPage);
+          console.log('toggling');
+          if (newPage.children[0].className.indexOf('direction-forced') === -1) {
+            domUtil.toggleDirection(newPage.children[0]);
           }
         }
         toggleIfUnforced();
-        if (domUtil.checkOverflow(newPage)) {
+        if (domUtil.checkOverflow(newPage.children[0])) {
           toggleIfUnforced();
           newPage.children[0].removeChild(photoEl);
-          newPage = getNewPage();
+          newPage = domUtil.getNewPage();
           newPage.children[0].appendChild(photoEl);
         }
         // if we did not execute the above, switching the flow direction fixed

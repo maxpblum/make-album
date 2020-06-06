@@ -18,9 +18,11 @@ export const checkOverflow = (el) => {
 
 export const toggleDirection = el => {
   if (!el.className) return;
-  el.className = (el.className.indexOf('page-with-columns') !== -1
-                 ? el.className.replace('page-with-columns', 'page-with-rows')
-                 : el.className.replace('page-with-rows', 'page-with-columns'));
+  if (el.className.indexOf('page-with-columns') !== -1) {
+    el.className = el.className.replace('page-with-columns', 'page-with-rows')
+  } else if (el.className.indexOf('page-with-rows') !== -1) {
+    el.className = el.className.replace('page-with-rows', 'page-with-columns');
+  }
 };
 
 export const forceDirection = (pageEl, direction) => {
@@ -33,4 +35,14 @@ export const forceDirection = (pageEl, direction) => {
   if (pageEl.className.indexOf('direction-forced') === -1) {
     pageEl.className += ' direction-forced';
   }
+};
+
+export const getNewPage = () => {
+  const page = document.createElement('div');
+  page.className = 'outer-page';
+  document.body.appendChild(page);
+  const pageContent = document.createElement('div');
+  pageContent.className = 'page page-with-columns';
+  page.appendChild(pageContent);
+  return page;
 };

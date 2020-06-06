@@ -2,30 +2,26 @@ body {
   padding: 0px;
   margin: 0px;
 }
-.page {
+.outer-page {
   display: block;
   margin: 0;
+  padding: 0;
   border: 1px black dotted;
 }
-.page-content {
+.page {
   display: flex;
   margin: 0;
-  padding: 0;
   align-content: space-around;
   flex-wrap: wrap;
   overflow: hidden;
 }
-.page-with-columns .page-content {
+.page-with-columns {
   flex-direction: column;
 }
-.page-with-rows .page-content {
+.page-with-rows {
   flex-direction: row;
 }
 .photo {
-  display: none;
   object-fit: cover;
   object-position: center;
-}
-.page .photo {
-  display: inline;
 }
