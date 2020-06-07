@@ -79,14 +79,6 @@ function getChangeInfo(oldPagination, newPagination) {
   };
 }
 
-const getLoadedPhoto = (url, code, parent) => new Promise(resolve => {
-  const photoEl = document.createElement('img');
-  photoEl.src = url;
-  photoEl.className = `photo ${code}`;
-  parent.appendChild(photoEl);
-  photoEl.onload = () => resolve(photoEl);
-});
-
 function renderLayout(lastUnchangedPage, changedPagination) {
   const pages = document.body.children;
   for (let i = pages.length - 1; i >= 0; i--) {
@@ -113,13 +105,16 @@ function renderLayout(lastUnchangedPage, changedPagination) {
     }
 
     if (item === 'rows' || item === 'columns') {
-      domUtil.forceDirection(newPage, item);
+      domUtil.forceDirection(newPage.children[0], item);
       return;
     }
 
-    newPage.children[0].className += ` ${item}`;
     const photoCode = item.split(' ')[0];
-    return getLoadedPhoto(window.photoMap[photoCode].image_file, item, newPage.children[0]).then(photoEl => {
+    return domUtil.addPhotoToParent(
+      window.photoMap[photoCode].image_file,
+      item,
+      newPage.children[0],
+    ).then(photoEl => {
       console.log('adding photo ' + item);
       if (domUtil.checkOverflow(newPage.children[0])) {
         console.log('overflowing');
@@ -132,9 +127,13 @@ function renderLayout(lastUnchangedPage, changedPagination) {
         toggleIfUnforced();
         if (domUtil.checkOverflow(newPage.children[0])) {
           toggleIfUnforced();
-          newPage.children[0].removeChild(photoEl);
+          domUtil.removePhotoFromParent(photoEl, item, newPage.children[0]);
           newPage = domUtil.getNewPage();
-          newPage.children[0].appendChild(photoEl);
+          return domUtil.addPhotoToParent(
+            window.photoMap[photoCode].image_file,
+            item,
+            newPage.children[0],
+          );
         }
         // if we did not execute the above, switching the flow direction fixed
         // the overflow issue

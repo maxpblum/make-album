@@ -46,3 +46,17 @@ export const getNewPage = () => {
   page.appendChild(pageContent);
   return page;
 };
+
+export const addPhotoToParent = (url, className, parent) => new Promise(resolve => {
+  const photoEl = document.createElement('img');
+  photoEl.src = url;
+  photoEl.className = `photo ${className}`;
+  parent.appendChild(photoEl);
+  parent.className += ` ${className}`;
+  photoEl.onload = () => resolve(photoEl);
+});
+
+export const removePhotoFromParent = (photo, className, parent) => {
+  parent.removeChild(photo);
+  parent.className = parent.className.replace(` ${className}`, '');
+};
