@@ -25,3 +25,9 @@ body {
   object-fit: cover;
   object-position: center;
 }
+.print-mode .outer-page {
+  border: none;
+}
+.print-mode .debug-tag {
+  display: none;
+}

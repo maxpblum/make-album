@@ -49,6 +49,10 @@ please feel free.)
 
 ### Edit your album
 
+Edit the following files *in your album directory* (not the original copies in
+the code repository) to get hot-reloaded changes to your album, which will also
+persist after reloading the page.
+
 * Use `sizing.json` to change the page size in `units` (e.g. inches, cm, mm), the
   number of pixels per unit (maybe a lower number is better for fast rendering
   while you play with the layout? Then you can make it higher before saving to
@@ -69,3 +73,42 @@ please feel free.)
     on its own line. This might not work as intended in all cases, so the best
     supported way to do this is to add a `break` on one line, then `rows` or
     `columns` on the next line. (`break` should be skipped for the very first page.)
+  * To add temporary page captions (useful for finding a page in the browser
+    with ctrl+f), add them following the word `break`, on the same line, e.g.
+    `break: June vacation section`.
+  * To omit a photo, just remove that photo's whole line from `pagination.txt`.
+* Use `per_photo_styles.css` to make changes to individual photo stylings, or
+  page stylings. This may be tricky if you aren't familiar with HTML+CSS. You
+  can select a photo whose code is `abc` with `.photo.abc`, or if you've added a
+  tag like `silly-dog-photo` you can select it with `.photo.silly-dog-photo`. If
+  you want to make changes to the page that *contains* that photo, select
+  `.page.abc` or `.page.silly-dog-photo`. Beware, these changes might not have the
+  intended effects if you edit `pagination.txt` afterwards, since different photos
+  may be grouped together on the same page after a pagination change. To ensure
+  some consistency, use forced page breaks to block any automatic re-pagination
+  for the enclosed list of photos.
+
+### Direct in-browser editing
+
+If you can't make quite the changes you want via `pagination.txt`,
+`per_photo_styles.css`, and `sizing.json`, but you can get your desired results
+by editing the DOM and/or styles in your browser, your best bet is probably to
+get as close as possible using the methods above, then Save a copy of the album
+somewhere *other* than the album directory using the browser's save function.
+After that, you ought to be able to repeatedly load that new saved copy, edit it
+in the browser, and re-save it (or save yet another copy).
+
+### Save to PDF
+
+If you used a low number of pixels per unit in `sizing.json`, edit this to be a
+large enough number for printing. If your units are inches, you should set this
+to the maximum DPI supported by your printer or printing service.
+
+Remove page border and temporary captions by entering `togglePrintMode();` in
+the browser's JS console. You can do this as many times as you like to switch
+between editing mode and print mode.
+
+Use your the "Save to PDF" function provided by your browser and/or OS (as a
+printer option) to create a PDF. Make sure that the PDF is set to use a page
+size that matche the dimensions you need to print to, as well as the dimensions
+in `sizing.json`.

@@ -66,3 +66,11 @@ export const removePhotoFromParent = (photo, className, parent) => {
   parent.removeChild(photo);
   parent.className = parent.className.replace(` ${className}`, '');
 };
+
+export const togglePrintMode = () => {
+  if (document.body.className.indexOf('print-mode') === -1) {
+    document.body.className += ' print-mode';
+  } else {
+    document.body.className = document.body.className.replace('print-mode', '');
+  }
+};

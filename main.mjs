@@ -96,7 +96,7 @@ function renderLayout(lastUnchangedPage, changedPagination) {
     if (item.startsWith('break')) {
       // render a manual tag to find the right spot.
       const debugTag = document.createElement('p');
-      debugTag.className = 'debugTag';
+      debugTag.className = 'debug-tag';
       debugTag.innerHTML = item;
       document.body.appendChild(debugTag);
 
@@ -163,3 +163,5 @@ window.addEventListener(
       attachTagNameListener('div', domUtil.toggleDirection);
 
     });
+
+window.togglePrintMode = domUtil.togglePrintMode;
