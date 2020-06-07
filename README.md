@@ -2,6 +2,15 @@
 
 Supported in no way whatsoever!
 
+## Dependencies
+
+For this to work, you will need Python 3.7+, as well as these tools (check for
+each one with `which TOOL_NAME`):
+
+* `exiftool`
+* `heif-convert`
+* `unzip`
+
 ## Instructions
 
 ### Get photo album as a .zip file
