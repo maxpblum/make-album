@@ -195,6 +195,6 @@ def get_parsed_args():
 
 if __name__ == '__main__':
     args = get_parsed_args()
-    create_data_dir(args.zipfile[0], args.directory[0])
+    # create_data_dir(args.zipfile[0], args.directory[0])
     copy_default_files(args.directory[0])
-    serve_album(args.directory[0])
+    # serve_album(args.directory[0])
