@@ -6,17 +6,20 @@ const loadImpl = (url, taskWhenChanged, reload) => {
   const fetchAndUpdate = () => {
     if (waiting) return;
     waiting = true;
-    waitUntilUnlocked = waitUntilUnlocked.then(
-      fetch(url)
+    waitUntilUnlocked = waitUntilUnlocked.then(() => {
+      return fetch(url)
       .then(response => response.text())
       .then(text => {
         if (text !== stored) {
           const old = stored;
-          stored = text;
-          taskWhenChanged(text, old);
+          stored = text
+          return taskWhenChanged(text, old);
         }
+      })
+      .then(() => {
         waiting = false;
-      }));
+      });
+    });
   };
   fetchAndUpdate();
   if (!reload) return;

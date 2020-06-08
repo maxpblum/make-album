@@ -2,6 +2,8 @@ import { hotReload, loadOnce } from './hotReload.mjs';
 import * as domUtil from './domUtil.mjs';
 import * as funcUtil from './funcUtil.mjs';
 
+let currentPagination = [];
+
 // Create photo metadata hash map.
 loadOnce('sorted_photo_data.json', (text) => {
   console.log('processing photo JSON');
@@ -35,6 +37,9 @@ hotReload('sizing.json', (newText) => {
   const rowHeight = 1.0 * pageHeight / data.rows_per_page - gap;
   const columnWidth = 1.0 * pageWidth / data.columns_per_page - gap;
 
+  const photoMaxWidth = pageWidth - gap;
+  const photoMaxHeight = pageHeight - gap;
+
   styleTag.innerHTML = `
     .outer-page {
       padding: ${pagePadding}px;
@@ -48,6 +53,8 @@ hotReload('sizing.json', (newText) => {
     }
     .photo {
       padding: ${photoPadding}px;
+      max-width: ${photoMaxWidth}px;
+      max-height: ${photoMaxHeight}px;
     }
     .page-with-rows .photo {
       height: ${rowHeight}px;
@@ -56,12 +63,19 @@ hotReload('sizing.json', (newText) => {
       width: ${columnWidth}px;
     }
   `;
+
+  if (currentPagination.length > 0) {
+    return renderLayout(null, currentPagination);
+  }
 });
 
 // Create per-photo style tag and hot reload.
 hotReload('per_photo_styles.css', (newText) => {
   if (!newText) return;
   domUtil.getOrCreateStyleTag('per-photo-styles').innerHTML = newText;
+  if (currentPagination.length > 0) {
+    return renderLayout(null, currentPagination);
+  }
 });
 
 // Load and render layout, and hot reload.
@@ -69,7 +83,8 @@ hotReload('pagination.txt', (newText, oldText) => {
   const oldPagination = oldText ? oldText.trim().split('\n') : [];
   const newPagination = newText.trim().split('\n');
   const {lastUnchangedPage, changedPagination} = getChangeInfo(oldPagination, newPagination);
-  renderLayout(lastUnchangedPage, changedPagination);
+  currentPagination = changedPagination;
+  return renderLayout(lastUnchangedPage, changedPagination);
 });
 
 function getChangeInfo(oldPagination, newPagination) {

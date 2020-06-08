@@ -96,6 +96,26 @@ persist after reloading the page.
   may be grouped together on the same page after a pagination change. To ensure
   some consistency, use forced page breaks to block any automatic re-pagination
   for the enclosed list of photos.
+  * One common layout edit you might want is to take a single photo and enlarge
+    it, giving it its own row or column. Here's a simple way to do this:
+    1. Enlarge the photo by giving it a larger *cross-axis size*. If the page
+       has rows, give the photo a larger *height*. If it has columns, give the
+       photo a larger width. Example:
+       ```
+       .photo.abc {
+         height: 60%;  /* 60% of the available page height */
+       }
+       ```
+    2. If the other photos on the page should shrink, edit their height first,
+       like this:
+       ```
+       .page.abc .photo {
+         height: 35%;
+       }
+       .photo.abc {
+         height: 60% !important;
+       }
+       ```
 
 ### Direct in-browser editing
 
