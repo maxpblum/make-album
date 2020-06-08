@@ -1,3 +1,23 @@
+### (up next):
+
+* Move to async/await for cleaner code
+* Split rendering into a module for clearer top-down structure
+* Make rendering cancelable (don't block new renders while old renders are still happening; instead, when a new render is requested, drop the old ones on the floor)
+* Make rendering check-and-modify instead of always-build-from-scratch
+  * Instead of adding a new page, move to the next existing page, reset its className
+  * Instead of adding a new `<img>` tag, check if the next `<img>` tag on the current page has the correct photo code. If so, leave it untouched and move on. If not, find the correct photo element by its className. If it exists, move it to the correct position. If not, build it.
+  * After every creation-or-check of an `<img>` tag, check overflow as before.
+  * If there is overflow and direction is not forced, try fixing it by toggling direction.
+  * If there is still overflow, move the *last* `<img>` tag on the current page to the front of the next page and repeat.
+  * If `break`, move any remaining `<img>` tags on the current page to the front of the next page. Then check that the next element after the current page is the appropriate `<break>`, create it if it doesn't exist.
+  
+### some handy assumptions
+
+* No photo is ever expected to appear more than once
+* The first page will not start with a break
+* There are never two breaks in a row
+* No breaks at the end
+
 # Make a printable photo album
 
 Supported in no way whatsoever!
