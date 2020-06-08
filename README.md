@@ -5,7 +5,7 @@
 * Make rendering cancelable (don't block new renders while old renders are still happening; instead, when a new render is requested, drop the old ones on the floor)
 * Make rendering check-and-modify instead of always-build-from-scratch
   * Instead of adding a new page, move to the next existing page, reset its className
-  * Instead of adding a new `<img>` tag, check if the next `<img>` tag on the current page has the correct photo code. If so, leave it untouched and move on. If not, find the correct photo element by its className. If it exists, move it to the correct position. If not, build it.
+  * Instead of adding a new `<img>` tag, check if the next `<img>` tag on the current page has the correct photo code. If so, leave it untouched and move on. If not, find the correct photo element by its className. If it exists, move it to the correct position, then reset its className (in case the extra tags have changed). If it doesn't exist, build it.
   * After every creation-or-check of an `<img>` tag, check overflow as before.
   * If there is overflow and direction is not forced, try fixing it by toggling direction.
   * If there is still overflow, move the *last* `<img>` tag on the current page to the front of the next page and repeat.
@@ -14,6 +14,7 @@
 ### some handy assumptions
 
 * No photo is ever expected to appear more than once
+* An `<img>` tag won't have more than one of the three-letter photo codes in its className.
 * The first page will not start with a break
 * There are never two breaks in a row
 * No breaks at the end
