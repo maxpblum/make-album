@@ -1,5 +1,5 @@
 import { hotReload, loadOnce } from './hotReload.mjs';
-import renderLayout from './render.mjs';
+import Renderer from './render.mjs';
 import * as domUtil from './domUtil.mjs';
 
 let currentPagination = [];
@@ -65,7 +65,7 @@ hotReload('sizing.json', (newText) => {
   `;
 
   if (currentPagination.length > 0) {
-    return renderLayout(null, currentPagination);
+    return Renderer.requestRender(currentPagination);
   }
 });
 
@@ -74,25 +74,16 @@ hotReload('per_photo_styles.css', (newText) => {
   if (!newText) return;
   domUtil.getOrCreateStyleTag('per-photo-styles').innerHTML = newText;
   if (currentPagination.length > 0) {
-    return renderLayout(null, currentPagination);
+    return Renderer.requestRender(currentPagination);
   }
 });
 
 // Load and render layout, and hot reload.
 hotReload('pagination.txt', (newText, oldText) => {
-  const oldPagination = oldText ? oldText.trim().split('\n') : [];
   const newPagination = newText.trim().split('\n');
-  const {lastUnchangedPage, changedPagination} = getChangeInfo(oldPagination, newPagination);
-  currentPagination = changedPagination;
-  return renderLayout(lastUnchangedPage, changedPagination);
+  currentPagination = newPagination;
+  return Renderer.requestRender(currentPagination);
 });
-
-function getChangeInfo(oldPagination, newPagination) {
-  return {
-    lastUnchangedPage: null,
-    changedPagination: newPagination,
-  };
-}
 
 window.addEventListener(
     'load', (event) => {
