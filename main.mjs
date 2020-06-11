@@ -1,7 +1,6 @@
 import { hotReload, loadOnce } from './hotReload.mjs';
 import renderLayout from './render.mjs';
 import * as domUtil from './domUtil.mjs';
-import * as funcUtil from './funcUtil.mjs';
 
 let currentPagination = [];
 
