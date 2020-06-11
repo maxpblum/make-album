@@ -1,6 +1,6 @@
 import * as domUtil from './domUtil.mjs';
 
-export default function renderLayout(lastUnchangedPage, changedPagination) {
+export default async function renderLayout(lastUnchangedPage, changedPagination) {
   const pages = document.body.children;
   for (let i = pages.length - 1; i >= 0; i--) {
     if (pages[i] === lastUnchangedPage) break;
@@ -9,7 +9,7 @@ export default function renderLayout(lastUnchangedPage, changedPagination) {
 
   let newPage;
 
-  funcUtil.promisersListToPromiseChain(changedPagination.map(item => () => {
+  for (const item of changedPagination) {
 
     if (!newPage) newPage = domUtil.getNewPage();
 
@@ -21,44 +21,44 @@ export default function renderLayout(lastUnchangedPage, changedPagination) {
       document.body.appendChild(debugTag);
 
       newPage = domUtil.getNewPage();
-      return;
+      continue;
     }
 
     if (item === 'rows' || item === 'columns') {
       domUtil.forceDirection(newPage.children[0], item);
-      return;
+      continue;
     }
 
     const photoCode = item.split(' ')[0];
-    return domUtil.addPhotoToParent(
+    const photoEl = await domUtil.addPhotoToParent(
       window.photoMap[photoCode].image_file,
       item,
       newPage.children[0],
-    ).then(photoEl => {
-      if (domUtil.checkOverflow(newPage.children[0])) {
-        const toggleIfUnforced = () => {
-          if (newPage.children[0].className.indexOf('direction-forced') === -1) {
-            domUtil.toggleDirection(newPage.children[0]);
-          }
+    );
+
+    if (domUtil.checkOverflow(newPage.children[0])) {
+      const toggleIfUnforced = () => {
+        if (newPage.children[0].className.indexOf('direction-forced') === -1) {
+          domUtil.toggleDirection(newPage.children[0]);
         }
-        toggleIfUnforced();
-        if (domUtil.checkOverflow(newPage.children[0])) {
-          toggleIfUnforced();
-          domUtil.removePhotoFromParent(photoEl, item, newPage.children[0]);
-          newPage = domUtil.getNewPage();
-          return domUtil.addPhotoToParent(
-            window.photoMap[photoCode].image_file,
-            item,
-            newPage.children[0],
-          );
-        }
-        // if we did not execute the above, switching the flow direction fixed
-        // the overflow issue
       }
-    });
-  })).then(() => {
+      toggleIfUnforced();
+      if (domUtil.checkOverflow(newPage.children[0])) {
+        toggleIfUnforced();
+        domUtil.removePhotoFromParent(photoEl, item, newPage.children[0]);
+        newPage = domUtil.getNewPage();
+        await domUtil.addPhotoToParent(
+          window.photoMap[photoCode].image_file,
+          item,
+          newPage.children[0],
+        );
+      }
+      // if we did not execute the above, switching the flow direction fixed
+      // the overflow issue
+    }
+
     if (newPage && newPage.children && newPage.children.length === 0) {
       document.body.removeChild(newPage);
     }
-  });
+  }
 }
