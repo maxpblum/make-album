@@ -1,16 +1,21 @@
 import * as domUtil from './domUtil.mjs';
 
-export default class Renderer {
-  static async requestRender(pagination) {
-    const pages = document.body.children;
-    for (let i = pages.length - 1; i >= 0; i--) {
-      if (pages[i] === lastUnchangedPage) break;
-      document.body.removeChild(pages[i]);
-    }
+let ongoingRenderer = null;
 
+export default class Renderer {
+  constructor() {
+    this.canceled = false;
+  }
+
+  cancel() {
+    this.canceled = true;
+  }
+
+  async render(pagination) {
     let newPage;
 
     for (const item of pagination) {
+      if (this.canceled) break;
 
       if (!newPage) newPage = domUtil.getNewPage();
 
@@ -62,5 +67,15 @@ export default class Renderer {
         document.body.removeChild(newPage);
       }
     }
+  }
+
+  static async requestRender(pagination) {
+    if (ongoingRenderer) {
+      ongoingRenderer.cancel();
+    }
+    const renderer = new Renderer();
+    ongoingRenderer = renderer;
+    await renderer.render(pagination);
+    ongoingRenderer = null;
   }
 }
