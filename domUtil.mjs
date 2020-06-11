@@ -21,10 +21,8 @@ window.checkOverflow = checkOverflow;
 export const toggleDirection = el => {
   if (!el.className) return;
   if (el.className.indexOf('page-with-columns') !== -1) {
-    console.log('switching columns to rows');
     el.className = el.className.replace('page-with-columns', 'page-with-rows')
   } else if (el.className.indexOf('page-with-rows') !== -1) {
-    console.log('switching rows to columns');
     el.className = el.className.replace('page-with-rows', 'page-with-columns');
   }
 };

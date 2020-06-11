@@ -104,7 +104,6 @@ function renderLayout(lastUnchangedPage, changedPagination) {
   let newPage;
 
   funcUtil.promisersListToPromiseChain(changedPagination.map(item => () => {
-    console.log('processing item: ', item);
 
     if (!newPage) newPage = domUtil.getNewPage();
 
@@ -130,11 +129,8 @@ function renderLayout(lastUnchangedPage, changedPagination) {
       item,
       newPage.children[0],
     ).then(photoEl => {
-      console.log('adding photo ' + item);
       if (domUtil.checkOverflow(newPage.children[0])) {
-        console.log('overflowing');
         const toggleIfUnforced = () => {
-          console.log('toggling');
           if (newPage.children[0].className.indexOf('direction-forced') === -1) {
             domUtil.toggleDirection(newPage.children[0]);
           }
