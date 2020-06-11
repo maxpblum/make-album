@@ -1,3 +1,5 @@
+import * as domUtil from './domUtil.mjs';
+
 export default function renderLayout(lastUnchangedPage, changedPagination) {
   const pages = document.body.children;
   for (let i = pages.length - 1; i >= 0; i--) {
