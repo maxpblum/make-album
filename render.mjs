@@ -5,13 +5,21 @@ let ongoingRenderer = null;
 export default class Renderer {
   constructor() {
     this.canceled = false;
+    this.renderPromise = Promise.resolve();
   }
 
-  cancel() {
+  async cancel() {
     this.canceled = true;
+    await this.renderPromise;
   }
 
   async render(pagination) {
+    this.renderPromise =
+      this.renderPromise.then(() => this.renderImpl(pagination));
+    await this.renderPromise;
+  }
+
+  async renderImpl(pagination) {
     let newPage;
 
     for (const item of pagination) {
@@ -71,7 +79,7 @@ export default class Renderer {
 
   static async requestRender(pagination) {
     if (ongoingRenderer) {
-      ongoingRenderer.cancel();
+      await ongoingRenderer.cancel();
     }
     const renderer = new Renderer();
     ongoingRenderer = renderer;
