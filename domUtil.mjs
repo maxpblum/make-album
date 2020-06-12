@@ -72,3 +72,15 @@ export const togglePrintMode = () => {
     document.body.className = document.body.className.replace('print-mode', '');
   }
 };
+
+const getOrCreateTopLevelDiv(divId) => {
+  const existing = document.getElementById(divId);
+  if (existing) return existing;
+  const newDiv = document.createElement('div');
+  newDiv.id = divId;
+  document.body.appendChild(newDiv);
+  return newDiv;
+};
+
+export const getAlbumRoot = () => getOrCreateTopLevelDiv('album-root');
+export const getScratchSpace = () => getOrCreateTopLevelDiv('scratch-space');
