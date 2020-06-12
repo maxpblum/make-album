@@ -44,7 +44,7 @@ export const forceDirection = (pageEl, direction) => {
 export const getNewPage = () => {
   const page = document.createElement('div');
   page.className = 'outer-page';
-  document.body.appendChild(page);
+  getAlbumRoot().appendChild(page);
   const pageContent = document.createElement('div');
   pageContent.className = 'page page-with-columns';
   page.appendChild(pageContent);
@@ -66,14 +66,14 @@ export const removePhotoFromParent = (photo, className, parent) => {
 };
 
 export const togglePrintMode = () => {
-  if (document.body.className.indexOf('print-mode') === -1) {
-    document.body.className += ' print-mode';
+  if (getAlbumRoot().className.indexOf('print-mode') === -1) {
+    getAlbumRoot().className += ' print-mode';
   } else {
-    document.body.className = document.body.className.replace('print-mode', '');
+    getAlbumRoot().className = getAlbumRoot().className.replace('print-mode', '');
   }
 };
 
-const getOrCreateTopLevelDiv(divId) => {
+const getOrCreateTopLevelDiv = (divId) => {
   const existing = document.getElementById(divId);
   if (existing) return existing;
   const newDiv = document.createElement('div');

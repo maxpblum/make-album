@@ -1,9 +1,10 @@
-import * as domUtil from './domUtil.mjs';
+import * as dom from './domUtil.mjs';
 
 let ongoingRenderer = null;
 
 export default class Renderer {
-  constructor() {
+  constructor(pagination) {
+    this.pagination = pagination;
     this.canceled = false;
     this.renderPromise = Promise.resolve();
   }
@@ -15,68 +16,66 @@ export default class Renderer {
     console.log('cancel complete');
   }
 
-  async render(pagination) {
-    console.log('starting a render');
-    this.renderPromise =
-      this.renderPromise.then(() => this.renderImpl(pagination));
+  async render() {
+    this.renderPromise = (async () => {
+      await this.renderPromise;
+      console.log('starting a render');
+      this.clearAllContent();
+      await this.loadAllPhotos();
+      this.renderImpl();
+      console.log('render completed or canceled');
+    })();
     await this.renderPromise;
-    console.log('render completed or canceled');
   }
 
-  async renderImpl(pagination) {
+  renderImpl() {
     let newPage;
 
-    for (const item of pagination) {
+    for (const item of this.pagination) {
       if (this.canceled) break;
 
-      if (!newPage) newPage = domUtil.getNewPage();
+      if (!newPage) newPage = dom.getNewPage();
 
       if (item.startsWith('break')) {
         // render a manual tag to find the right spot.
         const debugTag = document.createElement('p');
         debugTag.className = 'debug-tag';
         debugTag.innerHTML = item;
-        document.body.appendChild(debugTag);
+        dom.getAlbumRoot().appendChild(debugTag);
 
-        newPage = domUtil.getNewPage();
+        newPage = dom.getNewPage();
         continue;
       }
 
       if (item === 'rows' || item === 'columns') {
-        domUtil.forceDirection(newPage.children[0], item);
+        dom.forceDirection(newPage.children[0], item);
         continue;
       }
 
       const photoCode = item.split(' ')[0];
-      const photoEl = await domUtil.addPhotoToParent(
-        window.photoMap[photoCode].image_file,
-        item,
-        newPage.children[0],
-      );
+      const photoEl = document.querySelectorAll(`.photo.${photoCode}`)[0];
+      photoEl.parentNode.removeChild(photoEl);
+      newPage.children[0].appendChild(photoEl);
 
-      if (domUtil.checkOverflow(newPage.children[0])) {
+      if (dom.checkOverflow(newPage.children[0])) {
         const toggleIfUnforced = () => {
           if (newPage.children[0].className.indexOf('direction-forced') === -1) {
-            domUtil.toggleDirection(newPage.children[0]);
+            dom.toggleDirection(newPage.children[0]);
           }
         }
         toggleIfUnforced();
-        if (domUtil.checkOverflow(newPage.children[0])) {
+        if (dom.checkOverflow(newPage.children[0])) {
           toggleIfUnforced();
-          domUtil.removePhotoFromParent(photoEl, item, newPage.children[0]);
-          newPage = domUtil.getNewPage();
-          await domUtil.addPhotoToParent(
-            window.photoMap[photoCode].image_file,
-            item,
-            newPage.children[0],
-          );
+          dom.removePhotoFromParent(photoEl, item, newPage.children[0]);
+          newPage = dom.getNewPage();
+          newPage.children[0].appendChild(photoEl);
         }
         // if we did not execute the above, switching the flow direction fixed
         // the overflow issue
       }
 
       if (newPage && newPage.children && newPage.children.length === 0) {
-        document.body.removeChild(newPage);
+        dom.getAlbumRoot().removeChild(newPage);
       }
     }
   }
@@ -85,9 +84,39 @@ export default class Renderer {
     if (ongoingRenderer) {
       await ongoingRenderer.cancel();
     }
-    const renderer = new Renderer();
+    const renderer = new Renderer(pagination);
     ongoingRenderer = renderer;
-    await renderer.render(pagination);
+    await renderer.render();
     ongoingRenderer = null;
+  }
+
+  async loadAllPhotos() {
+    for (const item of this.pagination) {
+      if (item.startsWith('break') || item === 'rows' || item === 'columns') {
+        continue;
+      }
+      const photoCode = item.split(' ')[0];
+      if (document.querySelectorAll(`.photo.${photoCode}`).length) {
+        continue;
+      }
+      const photoEl = await dom.addPhotoToParent(
+        window.photoMap[photoCode].image_file,
+        item,
+        dom.getScratchSpace(),
+      );
+    }
+  }
+
+  async clearAllContent() {
+    const pages = document.querySelectorAll('.outer-page');
+    for (let i = pages.length - 1; i >= 0; i--) {
+      const page = pages[i].children[0];
+      for (let j = page.children.length - 1; j >= 0; j--) {
+        const photo = page.children[j];
+        page.removeChild(photo);
+        dom.getScratchSpace().appendChild(photo);
+      }
+    }
+    document.body.removeChild(dom.getAlbumRoot());
   }
 }
