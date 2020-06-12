@@ -46,6 +46,14 @@ Here's what this script does:
 * Starts a simple static HTTP server in your destination folder
   * **NOTE: This server is not safe for public use. Do not attempt to serve it
     to external traffic this way.**
+    
+### Resume serving without rebuilding the album
+
+If you need to stop the server process and want to re-start it without starting from scratch, you can do that easily (using the directory from before:
+
+```
+python3 -m http.server --directory DIRECTORY
+```
 
 ### Load the album page
 
