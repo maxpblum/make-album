@@ -93,22 +93,27 @@ export default class Renderer {
 
   async loadAllPhotos() {
     const bar = new ProgressBar();
-    for (let i = 0; i < this.pagination.length; i++) {
-      const item = this.pagination[i];
-      bar.setProgress(100.0 * i / this.pagination.length);
+
+    let photosComplete = 0;
+
+    const processItem = async (item) => {
       if (item.startsWith('break') || item === 'rows' || item === 'columns') {
-        continue;
+        return;
       }
       const photoCode = item.split(' ')[0];
       if (document.querySelectorAll(`.photo.${photoCode}`).length) {
-        continue;
+        return;
       }
-      const photoEl = await dom.addPhotoToParent(
+      await dom.addPhotoToParent(
         window.photoMap[photoCode].image_file,
         item,
         dom.getScratchSpace(),
       );
-    }
+      bar.setProgress(100.0 * (++photosComplete) / this.pagination.length);
+    };
+
+    await Promise.all(this.pagination.map(processItem));
+
     bar.destroy();
   }
 
