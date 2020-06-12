@@ -15,7 +15,7 @@ const html = `<div id="progress-bar" style="
     height: 25px;
     margin-left: 2.5px;
     width: 0%;
-    transition: width 0.02s;
+    transition: width 0.1s;
     border-radius: 25px;
 "></div></div>`;
 
