@@ -150,6 +150,7 @@ def copy_default_files(directory):
             'per_photo_styles.css',
             'domUtil.mjs',
             'render.mjs',
+            'progress.mjs',
     ]:
         shutil.copyfile(filename, '{}/{}'.format(directory, filename))
 

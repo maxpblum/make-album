@@ -1,4 +1,5 @@
 import * as dom from './domUtil.mjs';
+import ProgressBar from './progress.mjs';
 
 let ongoingRenderer = null;
 
@@ -91,7 +92,10 @@ export default class Renderer {
   }
 
   async loadAllPhotos() {
-    for (const item of this.pagination) {
+    const bar = new ProgressBar();
+    for (let i = 0; i < this.pagination.length; i++) {
+      const item = this.pagination[i];
+      bar.setProgress(100.0 * i / this.pagination.length);
       if (item.startsWith('break') || item === 'rows' || item === 'columns') {
         continue;
       }
@@ -105,6 +109,7 @@ export default class Renderer {
         dom.getScratchSpace(),
       );
     }
+    bar.destroy();
   }
 
   async clearAllContent() {
