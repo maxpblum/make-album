@@ -9,14 +9,18 @@ export default class Renderer {
   }
 
   async cancel() {
+    console.log('starting a cancel');
     this.canceled = true;
     await this.renderPromise;
+    console.log('cancel complete');
   }
 
   async render(pagination) {
+    console.log('starting a render');
     this.renderPromise =
       this.renderPromise.then(() => this.renderImpl(pagination));
     await this.renderPromise;
+    console.log('render completed or canceled');
   }
 
   async renderImpl(pagination) {
