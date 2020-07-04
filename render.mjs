@@ -55,8 +55,10 @@ export default class Renderer {
 
       const photoCode = item.split(' ')[0];
       const photoEl = document.querySelectorAll(`.photo.${photoCode}`)[0];
+      photoEl.parentNode.className = photoEl.parentNode.className.replace(` ${photoCode}`, '');
       photoEl.parentNode.removeChild(photoEl);
       newPage.children[0].appendChild(photoEl);
+      newPage.children[0].className += ` ${photoCode}`;
 
       if (dom.checkOverflow(newPage.children[0])) {
         const toggleIfUnforced = () => {
@@ -108,6 +110,7 @@ export default class Renderer {
         window.photoMap[photoCode].image_file,
         item,
         dom.getScratchSpace(),
+	false,
       );
       bar.setProgress(100.0 * (++photosComplete) / this.pagination.length);
     };

@@ -100,6 +100,7 @@ window.addEventListener(
 
       // Attach direction toggle listener
       attachTagNameListener('div', domUtil.toggleDirection);
+      attachTagNameListener('img', domUtil.displayPhotoCode);
 
     });
 

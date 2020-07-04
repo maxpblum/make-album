@@ -51,12 +51,14 @@ export const getNewPage = () => {
   return page;
 };
 
-export const addPhotoToParent = (url, className, parent) => new Promise(resolve => {
+export const addPhotoToParent = (url, className, parent, addCodeToParent) => new Promise(resolve => {
   const photoEl = document.createElement('img');
   photoEl.src = url;
   photoEl.className = `photo ${className}`;
   parent.appendChild(photoEl);
-  parent.className += ` ${className}`;
+  if (addCodeToParent) {
+    parent.className += ` ${className}`;
+  }
   photoEl.onload = () => resolve(photoEl);
 });
 
@@ -84,3 +86,17 @@ const getOrCreateTopLevelDiv = (divId) => {
 
 export const getAlbumRoot = () => getOrCreateTopLevelDiv('album-root');
 export const getScratchSpace = () => getOrCreateTopLevelDiv('scratch-space');
+
+export const displayPhotoCode = el => {
+  if (!el.className || !el.className.startsWith('photo')) return;
+
+  const photoCode = el.className.slice(6, 9);
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerText = photoCode;
+
+  document.body.appendChild(overlay);
+  setTimeout(() => {
+    document.body.removeChild(overlay);
+  }, 3000);
+};
