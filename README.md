@@ -94,6 +94,8 @@ persist after reloading the page.
     with ctrl+f), add them following the word `break`, on the same line, e.g.
     `break: June vacation section`.
   * To omit a photo, just remove that photo's whole line from `pagination.txt`.
+* Look up a photo's three-letter code by clicking on it (this will make the code
+  appear in full-screen).
 * Use `per_photo_styles.css` to make changes to individual photo stylings, or
   page stylings. This may be tricky if you aren't familiar with HTML+CSS. You
   can select a photo whose code is `abc` with `.photo.abc`, or if you've added a
