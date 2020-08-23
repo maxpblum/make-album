@@ -49,7 +49,8 @@ Here's what this script does:
     
 ### Resume serving without rebuilding the album
 
-If you need to stop the server process and want to re-start it without starting from scratch, you can do that easily (using the directory from before:
+If you need to stop the server process and want to re-start it without starting
+from scratch, you can do that easily (using the directory from before):
 
 ```
 python3 -m http.server --directory DIRECTORY
