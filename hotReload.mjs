@@ -1,5 +1,22 @@
 let waitUntilUnlocked = Promise.resolve();
 
+const runningIntervals = [];
+const intervalsToResume = [];
+const pauseIntervals = () => {
+  for (const interval of runningIntervals) {
+    clearInterval(interval);
+  }
+  runningIntervals.length = 0;
+};
+const resumeIntervals = () => {
+  for (const callback of intervalsToResume) {
+    runningIntervals.push(setInterval(callback, 3000));
+  }
+};
+
+window.pauseIntervals = pauseIntervals;
+window.resumeIntervals = resumeIntervals;
+
 const loadImpl = (url, taskWhenChanged, reload) => {
   let stored = null;
   let waiting = false;
@@ -19,7 +36,9 @@ const loadImpl = (url, taskWhenChanged, reload) => {
   };
   fetchAndUpdate();
   if (!reload) return;
-  return setInterval(fetchAndUpdate, 3000);
+  pauseIntervals();
+  intervalsToResume.push(fetchAndUpdate);
+  resumeIntervals();
 };
 
 export const loadOnce = (url, task) => loadImpl(url, task, false);
