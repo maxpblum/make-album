@@ -8,7 +8,7 @@ For this to work, you will need Python 3.7+, as well as these tools (check for
 each one with `which TOOL_NAME`):
 
 * `exiftool`
-* `heif-convert`
+* `heif-convert` (install `libheif` if this is missing)
 * `unzip`
 
 ## Instructions
