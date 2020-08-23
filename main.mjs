@@ -22,29 +22,54 @@ hotReload('sizing.json', (newText) => {
 
   const unitsToPixels = units => units * data.pixels_per_unit;
 
-  const pageMargin = unitsToPixels(data.margin_units);
+  // "Margin" here is not a CSS margin, but means "intended gap between the edge
+  // of the PDF page and the nearest photo edge". (Padding does all the actual
+  // work instead.)
+  const margins =
+    [data.top_margin_units,
+     data.bottom_margin_units,
+     data.inner_margin_units,
+     data.outer_margin_units].map(unitsToPixels);
+
+  const [topMargin, bottomMargin, innerMargin, outerMargin] = margins;
+
   const gap = unitsToPixels(data.space_between_photos_units);
   const photoPadding = gap / 2.0;
-  const pagePadding = pageMargin - photoPadding;
+
+  const [topPadding, bottomPadding, innerPadding, outerPadding] =
+    margins.map(m => m - photoPadding);
 
   const outerWidth = unitsToPixels(data.width_units);
   const outerHeight = unitsToPixels(data.height_units);
 
   // Since width and height in CSS don't include padding or margin, we need to
   // subtract.
-  const pageWidth = unitsToPixels(data.width_units) - (2 * pagePadding);
-  const pageHeight = unitsToPixels(data.height_units) - (2 * pagePadding);
+  const pageWidth = unitsToPixels(data.width_units) - innerPadding - outerPadding;
+  const pageHeight = unitsToPixels(data.height_units) - topPadding - bottomPadding;
   const rowHeight = 1.0 * pageHeight / data.rows_per_page - gap;
   const columnWidth = 1.0 * pageWidth / data.columns_per_page - gap;
 
   const photoMaxWidth = pageWidth - gap;
   const photoMaxHeight = pageHeight - gap;
 
+  const leftPageMarker = (data.first_page_side === 'left') ? 'odd' : 'even';
+  // Still alternate, even if the JSON-based decision didn't work correctly.
+  const rightPageMarker = (leftPageMarker === 'odd') ? 'even' : 'odd';
+
   styleTag.innerHTML = `
     .outer-page {
-      padding: ${pagePadding}px;
+      padding-top: ${topPadding}px;
+      padding-bottom: ${bottomPadding}px;
       width: ${pageWidth}px;
       height: ${pageHeight}px;
+    }
+    .outer-page:nth-child(${leftPageMarker}) {
+      padding-left: ${outerPadding}px;
+      padding-right: ${innerPadding}px;
+    }
+    .outer-page:nth-child(${rightPageMarker}) {
+      padding-left: ${innerPadding}px;
+      padding-right: ${outerPadding}px;
     }
     .page {
       width: ${pageWidth}px;
