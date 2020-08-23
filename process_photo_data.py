@@ -58,7 +58,7 @@ def convert(exif, directory):
         return orig_name
     new_name = get_key_from_name(orig_name) + '.jpg'
     subprocess.run([
-        '(cd \'{}\' && heif-convert \'{}\' -q 100 \'{}\')'.format(
+        '(cd \'{}\' && heif-convert -q 100 \'{}\' \'{}\')'.format(
             directory, orig_name, new_name)
     ],
                    shell=True,
