@@ -1,3 +1,9 @@
+# Current status
+
+Blocked on PDF-saving issues
+
+Chrome seems to freeze up when trying to render the PDF, memory overflow. Try on powerful workstation? Also exploring using pandoc with latex, or wkhtmltopdf, or weasyprint. The latter two at least seem to render some photos with the wrong orientation, unclear why the orientation is bad.
+
 # Make a printable photo album
 
 Supported in no way whatsoever!
